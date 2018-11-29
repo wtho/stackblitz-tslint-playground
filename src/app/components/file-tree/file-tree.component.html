@@ -1,0 +1,13 @@
+
+<div *ngIf="tree$">
+  <h3>Repo</h3>
+  <p>
+    github.com/
+    <input [ngModel]="owner">
+    <input [ngModel]="repo">
+  </p>
+  <file-el
+    [file]="tree$ | async"
+    (select)="selectFile($event)"
+  ></file-el>
+</div>

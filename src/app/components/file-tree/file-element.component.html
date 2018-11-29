@@ -1,0 +1,17 @@
+
+
+<div *ngIf="file" class="pl-1">
+  <button (click)="select.emit(file)" *ngIf="file.type === 'file'">
+    {{file.name}}
+  </button>
+  <span *ngIf="file.type === 'dir'">
+    {{file.name}}
+  </span>
+  <div *ngIf="file.files">
+    <file-el
+      *ngFor="let child of file.files"
+      [file]="child"
+      (select)="select.emit($event)"
+    ></file-el>
+  </div>
+</div>
