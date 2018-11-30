@@ -1,3 +1,5 @@
-<svg-render [code]="code"></svg-render>
-<file-tree (setSelector)="select($event)"></file-tree>
-<file-viewer [code]="code"></file-viewer>
+<div class="root flex-row">
+  <file-tree (setSelector)="select($event)"></file-tree>
+  <file-viewer [code]="code"></file-viewer>
+  <svg-render [code]="code"></svg-render>
+</div>

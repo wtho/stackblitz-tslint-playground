@@ -65,11 +65,11 @@ export class GithubFileService {
     this.fileTree = null;
     if (TREE) {
       this.next();
-      this.fileTree$.next(TREE as GithubFile);
+      this.fileTree = TREE as GithubFile;
+      this.next();
       return
     }
     this.fetchFile(rootParent).subscribe(httpRes => {
-      console.log('got', rootParent, httpRes)
       if (!Array.isArray(httpRes)) {
         return this.reset();
       }

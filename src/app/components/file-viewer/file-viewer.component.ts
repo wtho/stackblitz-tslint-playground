@@ -10,7 +10,10 @@ export class FileViewerComponent {
   code = '';
 
   rows = 10;
-  columns = 80;
+
+  get columns() {
+    return this.code.split('\n').length + 5
+  }
 
 
 }

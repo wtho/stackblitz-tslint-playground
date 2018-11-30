@@ -9,7 +9,6 @@ import * as jsfc from 'js2flowchart';
 })
 export class SvgRenderComponent implements OnInit {
   @Input() set code(val: string) {
-    console.log('update svg code:', val)
     this._code = val;
     this.rerender();
   }
@@ -40,15 +39,15 @@ export class SvgRenderComponent implements OnInit {
       return
     }
     try {
-      console.log('rendering');
+
       const flowTree = this.flowTreeBuilder.build(this._code);
       const shapesTree = this.svgRender.buildShapesTree(flowTree);
 
-      console.log('built trees', flowTree, shapesTree);
       this.setSvg(shapesTree);
+
+      console.log('built trees', flowTree, shapesTree);
       } catch (err) {
-        console.error('no js it seems', err);
-        this.svg = null;
+        console.log('no js it seems');
       }
     
   }

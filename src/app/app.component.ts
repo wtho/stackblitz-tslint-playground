@@ -35,9 +35,7 @@ export class AppComponent implements OnInit {
   }
 
 
-  files$ = this.fileService.getTree().pipe(
-    map(flattenFile)
-  );
+  files$ = this.fileService.getTree().pipe(map(flattenFile));
 
   subscription = this.files$.subscribe();
     
