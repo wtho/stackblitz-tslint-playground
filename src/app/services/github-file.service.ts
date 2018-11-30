@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpResponse } from '@angular/common/http';
-import { flatMap, publishReplay, refCount } from 'rxjs/operators';
+import { flatMap, publishReplay, refCount, tap } from 'rxjs/operators';
 import { Observable, Subject } from 'rxjs';
 
 
@@ -43,7 +43,18 @@ export class GithubFileService {
   
   constructor(
     protected http: HttpClient
-  ) { }
+  ) {
+  }
+
+  protected next() {
+    this.fileTree$.next(this.fileTree);
+  }
+
+  protected reset() {
+    this.fileTree = null;
+    this.next();
+  }
+
 
   public getTree(): Observable<GithubFile> {
     return this.observableTree$;
@@ -53,30 +64,27 @@ export class GithubFileService {
     this.repo = repo;
     this.fileTree = null;
     if (TREE) {
-      this.fileTree$.next(null);
-      console.log('mocking data', rootParent, TREE.path);
+      this.next();
       this.fileTree$.next(TREE as GithubFile);
       return
     }
-    console.log('fetch', rootParent)
     this.fetchFile(rootParent).subscribe(httpRes => {
       console.log('got', rootParent, httpRes)
       if (!Array.isArray(httpRes)) {
-        return this.fileTree$.next(null);
+        return this.reset();
       }
       const root = httpRes.find(file => file.name === rootFolder)
       if (!root) {
-        return this.fileTree$.next(null);
+        return this.reset();
       }
       this.fileTree = root;
       root.files = [];
       this.fetchFile(root.path).subscribe(httpRes => this.integrateChildren(root, httpRes))
-      this.fileTree$.next(this.fileTree);
+      this.next();
     })
   }
 
   integrateChildren(parent: GithubFile, response: GithubFile | GithubFile[]) {
-    console.log('integrating into', parent.path)
     if (Array.isArray(response)) {
       parent.files.push(...response);
       return response
@@ -89,7 +97,7 @@ export class GithubFileService {
     } else {
       parent.files.push(response)
     }
-    this.fileTree$.next(this.fileTree);
+    this.next();
   }
 
   fetchFile(filePath): Observable<GithubFile | GithubFile[]> {
@@ -97,8 +105,11 @@ export class GithubFileService {
   }
 
   public fetchContent(file: GithubFile) {
-    return this.http.get(file.git_url)
-      .tap(newFile => Object.assign(file, newFile))
-      .subscribe(() => this.fileTree$.next(this.fileTree))
+    return this.http.get(file.git_url).pipe(
+        tap((newFile: any) => Object.assign(file, {content: newFile.content}))
+      )
+      .subscribe(result => {
+        this.next();
+      })
   }
 }

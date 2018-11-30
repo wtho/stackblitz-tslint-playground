@@ -2,7 +2,7 @@
 
 <div *ngIf="file" class="pl-1">
   <button (click)="select.emit(file)" *ngIf="file.type === 'file'">
-    {{file.name}}
+    {{file.name}} <span *ngIf="file.content">✓</span>
   </button>
   <span *ngIf="file.type === 'dir'">
     {{file.name}}

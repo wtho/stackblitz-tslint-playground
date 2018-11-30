@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, AfterViewInit } from '@angular/core';
+import { Component, Input, Output, OnInit, AfterViewInit, EventEmitter } from '@angular/core';
 import { GithubFileService } from '../../services/github-file.service';
 import { File } from '../../file.model';
 
@@ -12,7 +12,8 @@ export class FileTreeComponent implements OnInit, AfterViewInit {
   owner = 'wtho';
   repo = 'stackblitz-tslint-playground';
   content = '';
-  selector = '';
+  @Output()
+  setSelector = new EventEmitter<string>();
 
   get fullRepoPath() {
     return `${this.owner}/${this.repo}`
@@ -20,7 +21,6 @@ export class FileTreeComponent implements OnInit, AfterViewInit {
 
   tree$ = this.fileService.getTree();
   subscription = this.tree$.subscribe(
-    console.log
   );
   
   constructor(
@@ -30,12 +30,11 @@ export class FileTreeComponent implements OnInit, AfterViewInit {
   }
 
   selectFile(file: File) {
-    console.log('file selected', file);
-    this.selector = file.path;
+    this.setSelector.emit(file.path);
     if (file.content) {
       this.content = file.content;
     } else {
-
+      this.fileService.fetchContent(file as any);
     }
   }
 
